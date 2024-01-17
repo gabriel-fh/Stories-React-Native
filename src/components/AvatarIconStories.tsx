@@ -10,50 +10,7 @@ import {
 } from "react-native";
 import OpenedStory from "./OpenedStory";
 
-function AvatarIconStories() {
-  const userInfo: User[] = [
-    {
-      user_id: 1,
-      user_name: "Coca-Cola",
-      user_avatar: require("../../assets/stories/avatar-image/coca-cola-avatar.jpg"),
-      stories: [
-        {
-          story_id: 1,
-          story_image: require("../../assets/stories/story-image/coca-story-1.png"),
-        },
-      ],
-    },
-    {
-      user_id: 2,
-      user_name: "Absolut Vodka",
-      user_avatar: require("../../assets/stories/avatar-image/absolut-vodka-avatar.jpg"),
-    },
-    {
-      user_id: 3,
-      user_name: "Cerveja Therezópolis",
-      user_avatar: require("../../assets/stories/avatar-image/cerveja-therezopolis-avatar.jpg"),
-    },
-    {
-      user_id: 4,
-      user_name: "Vale Carioca",
-      user_avatar: require("../../assets/stories/avatar-image/vale-carioca-avatar.jpg"),
-    },
-    {
-      user_id: 5,
-      user_name: "Minuano",
-      user_avatar: require("../../assets/stories/avatar-image/minuano-avatar.jpg"),
-    },
-    {
-      user_id: 6,
-      user_name: "Italac",
-      user_avatar: require("../../assets/stories/avatar-image/italac-avatar.jpg"),
-    },
-    {
-      user_id: 7,
-      user_name: "Italac",
-      user_avatar: require("../../assets/stories/avatar-image/chivas-avatar.jpg"),
-    },
-  ];
+function AvatarIconStories({userInfo} : {userInfo: User[]}) {
 
   const [openedStory, setOpenedStory] = useState<User | null>(null);
 
