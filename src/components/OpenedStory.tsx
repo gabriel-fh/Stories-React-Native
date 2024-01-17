@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Animated,
+  TouchableWithoutFeedback,
 } from "react-native";
 
 function OpenedStory({
@@ -16,6 +17,17 @@ function OpenedStory({
   closeStory: Function;
 }) {
   const progress = useRef(new Animated.Value(0)).current;
+  const [currentStory, setCurrentStory] = useState<number>(0);
+
+  const nextStory = () => {
+    console.log("next");
+    setCurrentStory((prevState) => prevState + 1);
+  };
+  const previousStory = () => {
+    console.log("previous");
+    setCurrentStory((prevState) => prevState - 1);
+  };
+
   return (
     <View
       style={{
@@ -30,7 +42,7 @@ function OpenedStory({
       }}
     >
       <View style={{ position: "absolute", top: 35, left: 0 }}>
-        <View style={{marginBottom: 15}}>
+        <View style={{ marginBottom: 15 }}>
           <View
             style={{
               flexDirection: "row",
@@ -99,11 +111,33 @@ function OpenedStory({
           </TouchableOpacity>
         </View>
       </View>
-      <Image
-        source={story.stories && story.stories[0].story_image}
-        style={{ height: "100%", width: "100%" }}
-        resizeMode="contain"
-      />
+
+      {/* <View key={item.story_image} style={{ zIndex: -1 }}> */}
+        <Image
+          source={story.stories[currentStory].story_image}
+          style={{ height: "100%", width: "100%" }}
+          resizeMode="contain"
+        />
+      {/* </View> */}
+
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          height: "80%",
+          width: "100%",
+          zIndex: 999,
+          position: "absolute",
+          bottom: 50,
+        }}
+      >
+        <TouchableWithoutFeedback onPress={() => previousStory()}>
+          <View style={{ flex: 1 }} />
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={() => nextStory()}>
+          <View style={{ flex: 1 }} />
+        </TouchableWithoutFeedback>
+      </View>
     </View>
   );
 }

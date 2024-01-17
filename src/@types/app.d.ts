@@ -14,5 +14,5 @@ type User = {
   user_id: Number;
   user_name: String;
   user_avatar: ImageSourcePropType;
-  stories?: Story[];
+  stories: Story[];
 };
