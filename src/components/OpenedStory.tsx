@@ -10,22 +10,47 @@ import {
 } from "react-native";
 
 function OpenedStory({
-  story,
+  userInfo,
   closeStory,
+  user,
 }: {
-  story: User;
+  userInfo: User[];
   closeStory: Function;
+  user: User;
 }) {
   const progress = useRef(new Animated.Value(0)).current;
   const [currentStory, setCurrentStory] = useState<number>(0);
+  const [currentUser, setCurrentUser] = useState<number>(
+    userInfo.findIndex(
+      (currentUserInfo) => currentUserInfo.user_id === user.user_id
+    )
+  );
 
   const nextStory = () => {
     console.log("next");
-    setCurrentStory((prevState) => prevState + 1);
+    if (currentStory !== userInfo[currentUser].stories.length - 1) {
+      setCurrentStory((prevState) => prevState + 1);
+    } else {
+      if(currentUser !== userInfo.length - 1) {
+        setCurrentUser((prevState) => prevState + 1)
+        setCurrentStory(0)
+      } else {
+        closeStory()
+      }
+    }
   };
   const previousStory = () => {
     console.log("previous");
-    setCurrentStory((prevState) => prevState - 1);
+    if (currentStory - 1 >= 0) {
+      setCurrentStory((prevState) => prevState - 1);
+    } else {
+      if(currentUser - 1 >= 0) {
+        setCurrentUser((prevState) => prevState - 1);
+        setCurrentStory(userInfo[currentUser - 1].stories.length - 1)
+      } else {
+        closeStory()
+      }
+    }
   };
 
   return (
@@ -50,7 +75,7 @@ function OpenedStory({
               paddingHorizontal: 10,
             }}
           >
-            {story.stories.map((index, key) => {
+            {userInfo[currentUser].stories.map((index, key) => {
               return (
                 // THE BACKGROUND
                 <View
@@ -94,7 +119,7 @@ function OpenedStory({
             }}
           >
             <Image
-              source={story.user_avatar}
+              source={userInfo[currentUser]?.user_avatar}
               style={{
                 height: 40,
                 width: 40,
@@ -104,7 +129,7 @@ function OpenedStory({
             />
             <Text
               style={{ fontWeight: "500", fontSize: 14, color: "#fff" }}
-            >{`${story.user_name}`}</Text>
+            >{`${userInfo[currentUser].user_name}`}</Text>
           </View>
           <TouchableOpacity style={{ zIndex: 10 }} onPress={() => closeStory()}>
             <Text style={{ color: "#fff" }}>X</Text>
@@ -113,11 +138,11 @@ function OpenedStory({
       </View>
 
       {/* <View key={item.story_image} style={{ zIndex: -1 }}> */}
-        <Image
-          source={story.stories[currentStory].story_image}
-          style={{ height: "100%", width: "100%" }}
-          resizeMode="contain"
-        />
+      <Image
+        source={userInfo[currentUser].stories[currentStory]?.story_image}
+        style={{ height: "100%", width: "100%" }}
+        resizeMode="contain"
+      />
       {/* </View> */}
 
       <View

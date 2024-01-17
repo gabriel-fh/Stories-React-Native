@@ -78,8 +78,9 @@ function AvatarIconStories({userInfo} : {userInfo: User[]}) {
       />
       {openedStory && (
         <OpenedStory
-          story={openedStory}
+          userInfo={userInfo}
           closeStory={handleCloseStory}
+          user={openedStory}
         ></OpenedStory>
       )}
     </View>
