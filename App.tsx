@@ -57,6 +57,10 @@ export default function App() {
           story_id: 2,
           story_image: require("./assets/stories/story-image/vale-carioca-story-2.png"),
         },
+        {
+          story_id: 3,
+          story_image: require("./assets/stories/story-image/vale-carioca-story-2.png"),
+        },
       ],
     },
     {
@@ -100,6 +104,10 @@ export default function App() {
         },
         {
           story_id: 2,
+          story_image: require("./assets/stories/story-image/chivas-story-2.png"),
+        },
+        {
+          story_id: 3,
           story_image: require("./assets/stories/story-image/chivas-story-2.png"),
         },
       ],
