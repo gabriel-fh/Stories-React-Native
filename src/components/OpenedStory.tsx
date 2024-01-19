@@ -30,7 +30,8 @@ function OpenedStory({
   );
 
   const progress = new Animated.Value(0); // barra de progresso do stories
-  const [shouldResetProgress, setShouldResetProgress] = useState<boolean>(false);
+  const [shouldResetProgress, setShouldResetProgress] =
+    useState<boolean>(false);
 
   const controlProgress = () => {
     if (currentStory < userInfo[currentUser].stories.length - 1) {
@@ -51,9 +52,8 @@ function OpenedStory({
   useEffect(() => {
     if (shouldResetProgress) {
       progress.setValue(0);
-      setShouldResetProgress(false); // rdefine shouldResetProgress para false
+      setShouldResetProgress(false);
     }
-  
     Animated.timing(progress, {
       toValue: 1,
       duration: 5000,
@@ -62,12 +62,23 @@ function OpenedStory({
     }).start(({ finished }) => {
       if (finished) {
         controlProgress();
-      console.log("Progressbar - Current User : " + currentUser + "\nProgressbar - Current Story: " + currentStory);
-
+        console.log(
+          "Progressbar - Current User : " +
+            currentUser +
+            "\nProgressbar - Current Story: " +
+            currentStory
+        );
       }
     });
   }, [currentStory, currentUser, shouldResetProgress]);
-  
+
+
+  const pauseStory = function() {
+
+  }
+  const resumeStory = function() {
+
+  }
 
   const nextStory = () => {
     if (currentStory !== userInfo[currentUser].stories.length - 1) {
@@ -82,7 +93,6 @@ function OpenedStory({
         closeStory();
       }
     }
-    
   };
   const previousStory = () => {
     if (currentStory - 1 >= 0) {
@@ -161,7 +171,12 @@ function OpenedStory({
                       style={{
                         height: 3,
                         backgroundColor: "rgba(255, 255, 255, 1)",
-                        width: key === currentStory ? widthInterpolation : 0,
+                        width:
+                          currentStory < key
+                            ? 0
+                            : currentStory === key
+                            ? widthInterpolation
+                            : "100%",
                       }}
                     />
                   </View>
@@ -225,10 +240,18 @@ function OpenedStory({
             bottom: 0,
           }}
         >
-          <TouchableWithoutFeedback onPress={() => previousStory()}>
+          <TouchableWithoutFeedback
+            onPress={() => previousStory()}
+            onLongPress={() => pauseStory()}
+            onPressOut={() => resumeStory()}
+          >
             <View style={{ flex: 1 }} />
           </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={() => nextStory()}>
+          <TouchableWithoutFeedback
+            onPress={() => nextStory()}
+            onLongPress={() => pauseStory()}
+            onPressOut={() => resumeStory()}
+          >
             <View style={{ flex: 1 }} />
           </TouchableWithoutFeedback>
         </View>
