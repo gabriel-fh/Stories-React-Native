@@ -1,17 +1,20 @@
+import { ResizeMode, Video } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  Dimensions,
-  Image,
-  TouchableOpacity,
+  ActivityIndicator,
   Animated,
-  TouchableWithoutFeedback,
+  Dimensions,
+  Easing,
+  Image,
   SafeAreaView,
   StatusBar,
-  Easing,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
+
 
 function OpenedStory({
   userInfo,
@@ -32,7 +35,11 @@ function OpenedStory({
   const progress = new Animated.Value(0); // barra de progresso do stories
   const [shouldResetProgress, setShouldResetProgress] =
     useState<boolean>(false);
-
+  const animatedValue = useRef(progress).current;
+  const [currentValue, setCurrentValue] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [load, setLoad] = useState<boolean>(false);
+  // controla o progresso da barra
   const controlProgress = () => {
     if (currentStory < userInfo[currentUser].stories.length - 1) {
       // Se houver mais stories vai pro próximo
@@ -54,54 +61,90 @@ function OpenedStory({
       progress.setValue(0);
       setShouldResetProgress(false);
     }
+    if (!isPaused) {
+      if (userInfo[currentUser].stories[currentStory].story_video) {
+        if (load) {
+          Animated.timing(progress, {
+            toValue: 1,
+            duration: 5000,
+            easing: Easing.linear,
+            useNativeDriver: false,
+          }).start(({ finished }) => {
+            if (finished) {
+              controlProgress();
+            }
+          });
+        }
+      } else {
+        Animated.timing(progress, {
+          toValue: 1,
+          duration: 5000,
+          easing: Easing.linear,
+          useNativeDriver: false,
+        }).start(({ finished }) => {
+          if (finished) {
+            controlProgress();
+          }
+        });
+      }
+    }
+  }, [currentStory, currentUser, shouldResetProgress, isPaused, load]); // observa esses valores para animar a progressbar
+
+  // pausa a exibição do stories atual
+  const pauseStory = function () {
+    animatedValue.stopAnimation((value) => {
+      setCurrentValue(value);
+      setIsPaused(true);
+    });
+  };
+
+  // despausa a exibição do stories atual
+  const resumeStory = function () {
+    setIsPaused(false);
     Animated.timing(progress, {
       toValue: 1,
-      duration: 5000,
+      duration: 5000 * (1 - currentValue), // Ajusta a duração com base no progresso atual
       easing: Easing.linear,
       useNativeDriver: false,
     }).start(({ finished }) => {
       if (finished) {
         controlProgress();
-        console.log(
-          "Progressbar - Current User : " +
-            currentUser +
-            "\nProgressbar - Current Story: " +
-            currentStory
-        );
       }
     });
-  }, [currentStory, currentUser, shouldResetProgress]);
+  };
 
-
-  const pauseStory = function() {
-
-  }
-  const resumeStory = function() {
-
-  }
-
+  // avança pro próximo stories
   const nextStory = () => {
+    // verifica se o stories atua é o último
     if (currentStory !== userInfo[currentUser].stories.length - 1) {
       setCurrentStory((prevState) => prevState + 1);
+      setLoad(false);
     } else {
+      // verifica se o usuário atual é o último
       if (currentUser !== userInfo.length - 1) {
         setCurrentUser((prevState) => prevState + 1);
         setCurrentStory(0);
-        setShouldResetProgress(true); // configura shouldResetProgress como true
-        console.log("Próximo usuário");
+        setShouldResetProgress(true);
+        setLoad(false);
       } else {
         closeStory();
       }
     }
   };
+
+  // volta pro stories anterior
   const previousStory = () => {
+    // se o stories atual é no mínimo o primeiro da lista
     if (currentStory - 1 >= 0) {
       setCurrentStory((prevState) => prevState - 1);
+      setLoad(false);
     } else {
+      // verifica se o usuário atual é no mínimo o primeiro da lista
       if (currentUser - 1 >= 0) {
         setCurrentUser((prevState) => prevState - 1);
         setCurrentStory(userInfo[currentUser - 1].stories.length - 1);
         progress.setValue(0);
+        setLoad(false);
       } else {
         closeStory();
       }
@@ -121,7 +164,7 @@ function OpenedStory({
           zIndex: 999999,
           height: Dimensions.get("screen").height,
           width: "100%",
-          backgroundColor: "#fff",
+          backgroundColor: "#000",
           paddingVertical: 0,
           display: "flex",
           justifyContent: "space-between",
@@ -222,12 +265,52 @@ function OpenedStory({
             </TouchableOpacity>
           </View>
         </View>
+        {userInfo[currentUser].stories[currentStory].story_image ? (
+          <>
+            <Image
+              source={userInfo[currentUser].stories[currentStory].story_image}
+              style={{ height: "100%", width: "100%" }}
+              resizeMode="cover"
+            />
+          </>
+        ) : (
+          <>
+            {!load && (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: "center",
+                  height: Dimensions.get("window").height,
+                  width: Dimensions.get("window").width,
+                  backgroundColor: '#00',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0
+                }}
+              >
+                <ActivityIndicator size="large" color="#fff" />
+              </View>
+            )}
 
-        <Image
-          source={userInfo[currentUser].stories[currentStory]?.story_image}
-          style={{ height: "100%", width: "100%" }}
-          resizeMode="cover"
-        />
+            <Video
+              source={{
+                uri: userInfo[currentUser].stories[currentStory].story_video,
+              }}
+              rate={1.0}
+              volume={1.0}
+              resizeMode={ResizeMode.COVER}
+              positionMillis={0}
+              shouldPlay={true}
+              onPlaybackStatusUpdate={(AVPlaybackStatus) => {
+                console.log(AVPlaybackStatus.isLoaded);
+                setLoad(AVPlaybackStatus.isLoaded);
+              }}
+              onReadyForDisplay={() => {}}
+              style={{ height: "100%", width: "100%" }}
+            ></Video>
+          </>
+        )}
 
         <View
           style={{
@@ -258,7 +341,7 @@ function OpenedStory({
         <View
           style={{
             position: "absolute",
-            bottom: 0,
+            bottom: 40,
             width: "100%",
             display: "flex",
             flexDirection: "column",

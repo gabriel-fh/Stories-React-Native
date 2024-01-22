@@ -7,7 +7,7 @@ type Story =
   | {
       story_id: Number;
       story_image?: never;
-      story_video: NodeRequire;
+      story_video: AVPlaybackSource;
     };
 
 type User = {

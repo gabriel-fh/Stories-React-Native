@@ -37,3 +37,5 @@ yarn-error.*
 test.tsx
 
 .vscode
+
+.story-video

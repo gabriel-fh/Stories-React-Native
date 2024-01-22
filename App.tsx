@@ -14,7 +14,7 @@ export default function App() {
         },
         {
           story_id: 2,
-          story_image: require("./assets/stories/story-image/coca-story-2.png"),
+          story_video: "./assets/stories/story-video/coca-story.mp4",
         },
       ],
     },
