@@ -40,6 +40,7 @@ function AvatarIconStories({userInfo} : {userInfo: User[]}) {
                 display: "flex",
                 alignItems: "center",
                 width: 70,
+                height: 100,
                 flex: 1,
               }}
               onPress={() => handlePressUser(item)}

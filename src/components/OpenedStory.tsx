@@ -1,4 +1,4 @@
-import { ResizeMode, Video } from "expo-av";
+import { ResizeMode, Video, VideoProps } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -39,6 +39,7 @@ function OpenedStory({
   const [currentValue, setCurrentValue] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [load, setLoad] = useState<boolean>(false);
+  const videoRef = useRef<Video>(null);
   // controla o progresso da barra
   const controlProgress = () => {
     if (currentStory < userInfo[currentUser].stories.length - 1) {
@@ -62,7 +63,7 @@ function OpenedStory({
       setShouldResetProgress(false);
     }
     if (!isPaused) {
-      if (userInfo[currentUser].stories[currentStory].story_video) {
+      if (userInfo[currentUser].stories[currentStory].story_video ) {
         if (load) {
           Animated.timing(progress, {
             toValue: 1,
@@ -95,12 +96,19 @@ function OpenedStory({
     animatedValue.stopAnimation((value) => {
       setCurrentValue(value);
       setIsPaused(true);
+      if(userInfo[currentUser].stories[currentStory].story_video && videoRef.current) {
+        videoRef.current.pauseAsync();
+      }
     });
   };
 
   // despausa a exibição do stories atual
   const resumeStory = function () {
     setIsPaused(false);
+
+    if(userInfo[currentUser].stories[currentStory].story_video && videoRef.current) {
+      videoRef.current.playAsync();
+    }
     Animated.timing(progress, {
       toValue: 1,
       duration: 5000 * (1 - currentValue), // Ajusta a duração com base no progresso atual
@@ -294,6 +302,7 @@ function OpenedStory({
             )}
 
             <Video
+            ref={videoRef}
               source={{
                 uri: userInfo[currentUser].stories[currentStory].story_video,
               }}
@@ -308,7 +317,7 @@ function OpenedStory({
               }}
               onReadyForDisplay={() => {}}
               style={{ height: "100%", width: "100%" }}
-            ></Video>
+            />
           </>
         )}
 

@@ -14,7 +14,7 @@ export default function App() {
         },
         {
           story_id: 2,
-          story_video: "./assets/stories/story-video/coca-story.mp4",
+          story_video: "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/2.mp4?alt=media&token=fcd41460-a441-4841-98da-d8f9a714dd4d",
         },
       ],
     },
