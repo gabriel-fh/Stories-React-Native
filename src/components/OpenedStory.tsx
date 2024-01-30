@@ -38,7 +38,7 @@ function OpenedStory({
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [load, setLoad] = useState<boolean>(false);
   const videoRef = useRef<Video>(null);
-  const [progress, setProgress] = useState(0)
+  const [progress, setProgress] = useState<number>(0);
 
   const pauseStory = function () {
     setIsPaused(true);
@@ -90,7 +90,7 @@ function OpenedStory({
         closeStory();
       }
     }
-    setProgress(0)
+    setProgress(0);
   };
 
   return (
@@ -138,16 +138,19 @@ function OpenedStory({
             >
               {userInfo[currentUser].stories.map((_, index) => {
                 return (
-                  <ProgressBar
-                    key={index}
-                    index={index}
-                    duration={5}
-                    nextStory={nextStory}
-                    isPaused={isPaused}
-                    isActive={currentStory === index}
-                    progress={progress}
-                    setProgress={setProgress}
-                  />
+                  <>
+                    <ProgressBar
+                      key={index}
+                      index={index}
+                      duration={5}
+                      finished={index < currentStory}
+                      nextStory={nextStory}
+                      isPaused={isPaused}
+                      isActive={currentStory === index}
+                      progress={progress}
+                      setProgress={setProgress}
+                    />
+                  </>
                 );
               })}
             </View>

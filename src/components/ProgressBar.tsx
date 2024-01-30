@@ -9,14 +9,16 @@ const ProgressBar = ({
   isActive,
   progress,
   setProgress,
+  finished,
 }: {
   index: number;
   duration: number;
   nextStory: Function;
   isPaused: boolean;
   isActive: boolean;
-  progress: number,
-  setProgress: Function
+  progress: number;
+  setProgress: Function;
+  finished: boolean;
 }) => {
   const [startTime, setStartTime] = useState<number | null>(null);
 
@@ -59,7 +61,12 @@ const ProgressBar = ({
 
   return (
     <View style={styles.progressBar}>
-      <View style={[styles.progress, { width: `${progress}%` }]} />
+      <View
+        style={[
+          styles.progress,
+          { width: `${finished ? "100" : !isActive ? "0" : progress}%` },
+        ]}
+      />
     </View>
   );
 };
