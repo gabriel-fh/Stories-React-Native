@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import OpenedStory from "./OpenedStory";
 
-function AvatarIconStories({userInfo} : {userInfo: User[]}) {
+function AvatarIconStories({userInfo, isLoading} : {userInfo: User[], isLoading: boolean}) {
 
   const [openedStory, setOpenedStory] = useState<User | null>(null);
 
@@ -20,6 +20,7 @@ function AvatarIconStories({userInfo} : {userInfo: User[]}) {
 
   const handleCloseStory = () => {
     setOpenedStory(null);
+    console.log('fechou')
   };
 
   return (
@@ -82,6 +83,7 @@ function AvatarIconStories({userInfo} : {userInfo: User[]}) {
           userInfo={userInfo}
           closeStory={handleCloseStory}
           user={openedStory}
+          isLoading={isLoading}
         ></OpenedStory>
       )}
     </View>
