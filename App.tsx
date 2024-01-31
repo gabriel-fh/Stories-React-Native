@@ -1,7 +1,7 @@
-import { Image, View } from "react-native";
+import { Image, SafeAreaView, View } from "react-native";
 import AvatarIconStories from "./src/components/AvatarIconStories";
 import { useEffect, useState } from "react";
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function App() {
   const userInfo: User[] = [
@@ -123,7 +123,7 @@ export default function App() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  useEffect (() => {
+  useEffect(() => {
     for (const user of userInfo) {
       for (const story of user.stories) {
         if (story.story_image) {
@@ -131,7 +131,7 @@ export default function App() {
             .then(() => setIsLoading(true))
             .catch((err) => {
               setIsLoading(false);
-              console.log('Erro ao carregar imagens: ' + err);
+              console.log("Erro ao carregar imagens: " + err);
             });
         }
       }
@@ -139,8 +139,13 @@ export default function App() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AvatarIconStories userInfo={userInfo} isLoading={isLoading}></AvatarIconStories>
-    </GestureHandlerRootView>
+    // <SafeAreaView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AvatarIconStories
+          userInfo={userInfo}
+          isLoading={isLoading}
+        ></AvatarIconStories>
+      </GestureHandlerRootView>
+    /* </SafeAreaView> */
   );
 }

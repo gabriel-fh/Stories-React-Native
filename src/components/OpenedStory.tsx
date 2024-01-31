@@ -1,22 +1,20 @@
 // import { ResizeMode, Video, VideoProps } from "expo-av";
 import { ResizeMode, Video } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Animated,
   Dimensions,
-  Easing,
   Image,
-  SafeAreaView,
-  StatusBar,
   Text,
+  StatusBar,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
 import ProgressBar from "./ProgressBar";
+import { Icon } from "react-native-elements";
 
 function OpenedStory({
   userInfo,
@@ -86,8 +84,6 @@ function OpenedStory({
         setCurrentUser((prevState) => prevState - 1);
         setCurrentStory(userInfo[currentUser - 1].stories.length - 1);
         setLoad(false);
-      } else {
-        closeStory();
       }
     }
     setProgress(0);
@@ -95,9 +91,7 @@ function OpenedStory({
 
   return (
     <>
-      <SafeAreaView>
-        <StatusBar backgroundColor={"black"} barStyle={"light-content"} />
-      </SafeAreaView>
+      <StatusBar translucent backgroundColor="transparent" />
       <View
         style={{
           position: "absolute",
@@ -122,10 +116,10 @@ function OpenedStory({
               left: 0,
               right: 0,
               top: 0,
-              height: 100,
+              height: 200,
             }}
           />
-          <View style={{ marginBottom: 12 }}>
+          <View style={{ marginBottom: 60 }}>
             <View
               style={{
                 flex: 1,
@@ -133,24 +127,21 @@ function OpenedStory({
                 paddingHorizontal: 10,
                 height: 15,
                 flexDirection: "row",
-                // backgroundColor:'green'
               }}
             >
               {userInfo[currentUser].stories.map((_, index) => {
                 return (
-                  <>
-                    <ProgressBar
-                      key={index}
-                      index={index}
-                      duration={5}
-                      finished={index < currentStory}
-                      nextStory={nextStory}
-                      isPaused={isPaused}
-                      isActive={currentStory === index}
-                      progress={progress}
-                      setProgress={setProgress}
-                    />
-                  </>
+                  <ProgressBar
+                    key={index}
+                    index={index}
+                    duration={2}
+                    finished={index < currentStory}
+                    nextStory={nextStory}
+                    isPaused={isPaused}
+                    isActive={currentStory === index}
+                    progress={progress}
+                    setProgress={setProgress}
+                  />
                 );
               })}
             </View>
@@ -187,10 +178,10 @@ function OpenedStory({
               >{`${userInfo[currentUser].user_name}`}</Text>
             </View>
             <TouchableOpacity
-              style={{ zIndex: 10 }}
+              style={{ zIndex: 999999, width: 30, height: 30 }}
               onPress={() => closeStory()}
             >
-              <Text style={{ color: "#fff" }}>X</Text>
+              <Icon name="x" type="feather" size={30} color={"#fff"} />
             </TouchableOpacity>
           </View>
         </View>
@@ -266,7 +257,7 @@ function OpenedStory({
           style={{
             flex: 1,
             flexDirection: "row",
-            height: "91%",
+            height: "86%",
             width: "100%",
             zIndex: 999,
             position: "absolute",
@@ -293,7 +284,7 @@ function OpenedStory({
             <View style={{ flex: 1 }} />
           </TouchableWithoutFeedback>
         </View>
-        <View
+        {/* <View
           style={{
             position: "absolute",
             bottom: 40,
@@ -322,7 +313,7 @@ function OpenedStory({
           <Text style={{ color: "rgba(255, 255, 255, 0.75)" }}>
             Arraste pra cima
           </Text>
-        </View>
+        </View> */}
       </View>
     </>
   );

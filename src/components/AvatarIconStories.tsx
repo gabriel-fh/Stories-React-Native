@@ -5,8 +5,6 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  ImageSourcePropType,
-  Dimensions,
 } from "react-native";
 import OpenedStory from "./OpenedStory";
 
@@ -20,7 +18,6 @@ function AvatarIconStories({userInfo, isLoading} : {userInfo: User[], isLoading:
 
   const handleCloseStory = () => {
     setOpenedStory(null);
-    console.log('fechou')
   };
 
   return (
