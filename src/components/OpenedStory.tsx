@@ -207,6 +207,7 @@ function OpenedStory({
               <Image
                 source={{
                   uri: userInfo[currentUser].stories[currentStory].story_image,
+                  cache: 'only-if-cached'
                 }}
                 style={{ height: "100%", width: "100%" }}
                 resizeMode="cover"
