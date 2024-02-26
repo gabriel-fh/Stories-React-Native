@@ -1,7 +1,6 @@
-import { Image, SafeAreaView, View } from "react-native";
+import { Image } from "react-native";
 import AvatarIconStories from "./src/components/AvatarIconStories";
 import { useEffect, useState } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function App() {
   const userInfo: User[] = [
@@ -139,13 +138,9 @@ export default function App() {
   }, []);
 
   return (
-    // <SafeAreaView style={{ flex: 1 }}>
-      // <GestureHandlerRootView style={{ flex: 1 }}>
-        <AvatarIconStories
-          userInfo={userInfo}
-          isLoading={isLoading}
-        ></AvatarIconStories>
-      // {/* </GestureHandlerRootView> */}
-    /* </SafeAreaView> */
+    <AvatarIconStories
+      userInfo={userInfo}
+      isLoading={isLoading}
+    ></AvatarIconStories>
   );
 }

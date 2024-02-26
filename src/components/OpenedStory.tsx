@@ -42,7 +42,6 @@ const OpenedStory = React.memo(
     const [load, setLoad] = useState<boolean>(false);
     const videoRef = useRef<Video>(null);
     const [progress, setProgress] = useState<number>(0);
-    const memoizedSetProgress = useCallback(setProgress, []);
 
     const pauseStory = useCallback(() => {
       setIsPaused(true);
@@ -65,18 +64,32 @@ const OpenedStory = React.memo(
       }
     };
 
+    const nextUser = () => {
+      if (currentUser !== userInfo.length - 1) {
+        setCurrentUser((prevState) => prevState + 1);
+        setCurrentStory(0);
+        setLoad(false);
+      } else {
+        closeStory();
+      }
+      setProgress(0);
+    };
+
+    const previousUser = () => {
+      if (currentUser - 1 >= 0) {
+        setCurrentUser((prevState) => prevState - 1);
+        setCurrentStory(userInfo[currentUser - 1].stories.length - 1);
+        setLoad(false);
+      }
+      setProgress(0);
+    };
+
     const nextStory = () => {
       if (currentStory !== userInfo[currentUser].stories.length - 1) {
         setCurrentStory((prevState) => prevState + 1);
         setLoad(false);
       } else {
-        if (currentUser !== userInfo.length - 1) {
-          setCurrentUser((prevState) => prevState + 1);
-          setCurrentStory(0);
-          setLoad(false);
-        } else {
-          closeStory();
-        }
+        nextUser();
       }
       setProgress(0);
     };
@@ -86,11 +99,7 @@ const OpenedStory = React.memo(
         setCurrentStory((prevState) => prevState - 1);
         setLoad(false);
       } else {
-        if (currentUser - 1 >= 0) {
-          setCurrentUser((prevState) => prevState - 1);
-          setCurrentStory(userInfo[currentUser - 1].stories.length - 1);
-          setLoad(false);
-        }
+        previousUser();
       }
       setProgress(0);
     };
@@ -103,18 +112,18 @@ const OpenedStory = React.memo(
         y: event.nativeEvent.translationY,
       });
     };
-    
+
     const onGestureStateChange = (event) => {
       const { state } = event.nativeEvent;
-    
+
       if (state === State.BEGAN || state === State.ACTIVE) {
         pauseStory();
       } else if (state === State.END) {
         resumeStory();
-    
+
         if (gestureState.y > 45) closeStory();
-        else if (gestureState.x < -60) nextStory();
-        else if (gestureState.x > 60) previousStory();
+        else if (gestureState.x < -60) nextUser();
+        else if (gestureState.x > 60) previousUser();
       }
     };
 
@@ -134,7 +143,6 @@ const OpenedStory = React.memo(
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            // marginTop: Platform.OS === 'ios' ? 33 : 0
           }}
         >
           <View style={{ position: "absolute", top: 0, left: 0, zIndex: 20 }}>
@@ -300,7 +308,14 @@ const OpenedStory = React.memo(
               onLongPress={() => pauseStory()}
               onPressOut={() => resumeStory()}
             >
-              <View style={{ flex: 1 }} />
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <PanGestureHandler
+                  onGestureEvent={onGestureEvent}
+                  onHandlerStateChange={onGestureStateChange}
+                >
+                  <View style={{ flex: 1 }} />
+                </PanGestureHandler>
+              </GestureHandlerRootView>
             </TouchableWithoutFeedback>
             {/* direta */}
             <TouchableWithoutFeedback
@@ -308,7 +323,7 @@ const OpenedStory = React.memo(
               onLongPress={() => pauseStory()}
               onPressOut={() => resumeStory()}
             >
-              <GestureHandlerRootView style={{ flex: 1, backgroundColor: 'red' }}>
+              <GestureHandlerRootView style={{ flex: 1 }}>
                 <PanGestureHandler
                   onGestureEvent={onGestureEvent}
                   onHandlerStateChange={onGestureStateChange}
