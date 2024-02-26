@@ -140,12 +140,12 @@ export default function App() {
 
   return (
     // <SafeAreaView style={{ flex: 1 }}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      // <GestureHandlerRootView style={{ flex: 1 }}>
         <AvatarIconStories
           userInfo={userInfo}
           isLoading={isLoading}
         ></AvatarIconStories>
-      </GestureHandlerRootView>
+      // {/* </GestureHandlerRootView> */}
     /* </SafeAreaView> */
   );
 }
