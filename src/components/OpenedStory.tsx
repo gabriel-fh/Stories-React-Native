@@ -95,6 +95,29 @@ const OpenedStory = React.memo(
       setProgress(0);
     };
 
+    const [gestureState, setGestureState] = useState({ x: 0, y: 0 });
+
+    const onGestureEvent = (event) => {
+      setGestureState({
+        x: event.nativeEvent.translationX,
+        y: event.nativeEvent.translationY,
+      });
+    };
+    
+    const onGestureStateChange = (event) => {
+      const { state } = event.nativeEvent;
+    
+      if (state === State.BEGAN || state === State.ACTIVE) {
+        pauseStory();
+      } else if (state === State.END) {
+        resumeStory();
+    
+        if (gestureState.y > 45) closeStory();
+        else if (gestureState.x < -60) nextStory();
+        else if (gestureState.x > 60) previousStory();
+      }
+    };
+
     return (
       <>
         <StatusBar translucent backgroundColor="transparent" />
@@ -279,52 +302,22 @@ const OpenedStory = React.memo(
             >
               <View style={{ flex: 1 }} />
             </TouchableWithoutFeedback>
+            {/* direta */}
             <TouchableWithoutFeedback
               onPress={() => nextStory()}
               onLongPress={() => pauseStory()}
               onPressOut={() => resumeStory()}
             >
-              <GestureHandlerRootView style={{ flex: 1 }}>
+              <GestureHandlerRootView style={{ flex: 1, backgroundColor: 'red' }}>
                 <PanGestureHandler
-                  onGestureEvent={() => console.log("aaa")}
-                  onHandlerStateChange={() => console.log("bbb")}
+                  onGestureEvent={onGestureEvent}
+                  onHandlerStateChange={onGestureStateChange}
                 >
                   <View style={{ flex: 1 }} />
                 </PanGestureHandler>
               </GestureHandlerRootView>
             </TouchableWithoutFeedback>
           </View>
-
-          {/* <View
-          style={{
-            position: "absolute",
-            bottom: 40,
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            zIndex: 20,
-            paddingBottom: 30,
-            paddingTop: 20,
-          }}
-        >
-          <LinearGradient
-            colors={["transparent", "rgba(0,0,0,1)"]}
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: 100,
-            }}
-          />
-          <Text style={{ color: "rgba(255, 255, 255, 0.75)", fontSize: 30 }}>
-            ^
-          </Text>
-          <Text style={{ color: "rgba(255, 255, 255, 0.75)" }}>
-            Arraste pra cima
-          </Text>
-        </View> */}
         </View>
       </>
     );
