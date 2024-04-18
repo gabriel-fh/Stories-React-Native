@@ -1,9 +1,6 @@
-// import { ResizeMode, Video, VideoProps } from "expo-av";
-import { ResizeMode, Video } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
-  ActivityIndicator,
   Dimensions,
   Image,
   Text,
@@ -11,332 +8,343 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  StyleSheet,
+  Platform,
 } from "react-native";
+import ProgressBar from "./ProgressBar";
+import { Icon } from "react-native-elements";
+import * as FileSystem from "expo-file-system";
 import {
   GestureHandlerRootView,
   PanGestureHandler,
   State,
 } from "react-native-gesture-handler";
-import ProgressBar from "./ProgressBar";
-import { Icon } from "react-native-elements";
 
-const OpenedStory = React.memo(
-  ({
-    userInfo,
-    closeStory,
-    user,
-    isLoading,
-  }: {
-    userInfo: User[];
-    closeStory: Function;
-    user: User;
-    isLoading: boolean;
-  }) => {
-    const [currentStory, setCurrentStory] = useState<number>(0);
-    const [currentUser, setCurrentUser] = useState<number>(
-      userInfo.findIndex(
-        (currentUserInfo) => currentUserInfo.user_id === user.user_id
-      )
-    );
-    const [isPaused, setIsPaused] = useState<boolean>(false);
-    const [load, setLoad] = useState<boolean>(false);
-    const videoRef = useRef<Video>(null);
-    const [progress, setProgress] = useState<number>(0);
+function OpenedStory({
+  userInfo,
+  closeStory,
+  user,
+}: {
+  userInfo: User[];
+  closeStory: Function;
+  user: User;
+}) {
+  const [currentStory, setCurrentStory] = useState<number>(0);
+  const [currentUser, setCurrentUser] = useState<number>(
+    userInfo.findIndex((currentUser) => currentUser.id === user.id)
+  );
 
-    const pauseStory = useCallback(() => {
-      setIsPaused(true);
-      if (
-        userInfo[currentUser].stories[currentStory].story_video &&
-        videoRef.current
-      ) {
-        videoRef.current.pauseAsync();
-      }
-    }, [userInfo, currentUser, currentStory]);
+  const userAvatar = userInfo[currentUser]?.avatar;
+  const userName = userInfo[currentUser]?.name;
+  const currentStoryImage = userInfo[currentUser].images[currentStory]?.image;
 
-    const resumeStory = function () {
-      setIsPaused(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
+  const [gestureStateX, setGestureStateX] = useState<number>(0);
+  const [gestureStateY, setGestureStateY] = useState<number>(0);
 
-      if (
-        userInfo[currentUser].stories[currentStory].story_video &&
-        videoRef.current
-      ) {
-        videoRef.current.playAsync();
-      }
-    };
+  const pauseStory = useCallback(() => {
+    setIsPaused(true);
+  }, [currentStory]);
 
-    const nextUser = () => {
-      if (currentUser !== userInfo.length - 1) {
-        setCurrentUser((prevState) => prevState + 1);
-        setCurrentStory(0);
-        setLoad(false);
-      } else {
+  const resumeStory = function () {
+    setIsPaused(false);
+  };
+
+  const nextUser = () => {
+    if (currentUser !== userInfo.length - 1) {
+      setCurrentUser((prevState) => prevState + 1);
+      setCurrentStory(0);
+    } else {
+      closeStory();
+    }
+    setProgress(0);
+  };
+
+  const previousUser = () => {
+    if (currentUser - 1 >= 0) {
+      setCurrentUser((prevState) => prevState - 1);
+      setCurrentStory(userInfo[currentUser - 1].images.length - 1);
+    }
+    setProgress(0);
+  };
+
+  const nextStory = () => {
+    if (currentStory !== userInfo[currentUser].images.length - 1) {
+      setCurrentStory((prevState) => prevState + 1);
+    } else {
+      nextUser();
+    }
+    setProgress(0);
+  };
+
+  const previousStory = () => {
+    if (currentStory - 1 >= 0) {
+      setCurrentStory((prevState) => prevState - 1);
+    } else {
+      previousUser();
+    }
+    setProgress(0);
+  };
+
+  const onGestureEvent = (event: any) => {
+    setGestureStateX(event.nativeEvent.translationX);
+    setGestureStateY(event.nativeEvent.translationY);
+  };
+
+  const onGestureStateChange = (event: any) => {
+    const { state } = event.nativeEvent;
+
+    if (state === State.BEGAN || state === State.ACTIVE) {
+      pauseStory();
+    } else if (state === State.END) {
+      resumeStory();
+
+      if (gestureStateY > 45 && Math.abs(gestureStateX) < 60) {
         closeStory();
-      }
-      setProgress(0);
-    };
-
-    const previousUser = () => {
-      if (currentUser - 1 >= 0) {
-        setCurrentUser((prevState) => prevState - 1);
-        setCurrentStory(userInfo[currentUser - 1].stories.length - 1);
-        setLoad(false);
-      }
-      setProgress(0);
-    };
-
-    const nextStory = () => {
-      if (currentStory !== userInfo[currentUser].stories.length - 1) {
-        setCurrentStory((prevState) => prevState + 1);
-        setLoad(false);
-      } else {
+      } else if (gestureStateX < -60) {
         nextUser();
-      }
-      setProgress(0);
-    };
-
-    const previousStory = () => {
-      if (currentStory - 1 >= 0) {
-        setCurrentStory((prevState) => prevState - 1);
-        setLoad(false);
-      } else {
+      } else if (gestureStateX > 60) {
         previousUser();
       }
-      setProgress(0);
-    };
+    }
+  };
 
-    const [gestureState, setGestureState] = useState({ x: 0, y: 0 });
-
-    const onGestureEvent = (event) => {
-      setGestureState({
-        x: event.nativeEvent.translationX,
-        y: event.nativeEvent.translationY,
-      });
-    };
-
-    const onGestureStateChange = (event) => {
-      const { state } = event.nativeEvent;
-
-      if (state === State.BEGAN || state === State.ACTIVE) {
-        pauseStory();
-      } else if (state === State.END) {
-        resumeStory();
-
-        if (gestureState.y > 45) closeStory();
-        else if (gestureState.x < -60) nextUser();
-        else if (gestureState.x > 60) previousUser();
-      }
-    };
-
-    return (
-      <>
-        <StatusBar translucent backgroundColor="transparent" />
-        <View
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            zIndex: 999999,
-            height: Dimensions.get("screen").height,
-            width: "100%",
-            backgroundColor: "#000",
-            paddingVertical: 0,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <View style={{ position: "absolute", top: 0, left: 0, zIndex: 20 }}>
-            <LinearGradient
-              colors={["rgba(0,0,0,1)", "transparent"]}
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                top: 0,
-                height: 200,
-              }}
-            />
-            <View style={{ marginBottom: 60 }}>
-              <View
-                style={{
-                  flex: 1,
-                  paddingTop: 10,
-                  paddingHorizontal: 10,
-                  height: 15,
-                  flexDirection: "row",
-                }}
-              >
-                {userInfo[currentUser].stories.map((_, index) => {
-                  return (
-                    <ProgressBar
-                      key={index}
-                      index={index}
-                      duration={2}
-                      finished={index < currentStory}
-                      nextStory={nextStory}
-                      isPaused={isPaused}
-                      isActive={currentStory === index}
-                      progress={progress}
-                      setProgress={setProgress}
-                    />
-                  );
-                })}
-              </View>
-            </View>
-            <View
-              style={{
-                width: Dimensions.get("window").width,
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingHorizontal: 15,
-                zIndex: 99999,
-              }}
-            >
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={userInfo[currentUser]?.user_avatar}
-                  style={{
-                    height: 40,
-                    width: 40,
-                    borderRadius: 100,
-                    marginRight: 10,
-                  }}
+  return (
+    <>
+      <StatusBar barStyle="light-content" backgroundColor="#000" />
+      <View style={styles.container}>
+        <View style={styles.userProgressContainer}>
+          <LinearGradient
+            colors={["rgba(0,0,0,1)", "transparent"]}
+            style={styles.linearGradient}
+          />
+          <View style={styles.separator} />
+          <View style={styles.progressBarContainer}>
+            {userInfo[currentUser].images.map((_, index) => {
+              return (
+                <ProgressBar
+                  key={index}
+                  index={index}
+                  duration={4}
+                  finished={index < currentStory}
+                  nextStory={nextStory}
+                  isPaused={isPaused}
+                  isActive={currentStory === index}
+                  progress={progress}
+                  setProgress={setProgress}
                 />
-                <Text
-                  style={{ fontWeight: "500", fontSize: 14, color: "#fff" }}
-                >{`${userInfo[currentUser].user_name}`}</Text>
-              </View>
-              <TouchableOpacity
-                style={{ zIndex: 999999, width: 30, height: 30 }}
-                onPress={() => closeStory()}
-              >
-                <Icon name="x" type="feather" size={30} color={"#fff"} />
-              </TouchableOpacity>
-            </View>
+              );
+            })}
           </View>
-          {userInfo[currentUser].stories[currentStory].story_image ? (
-            <>
-              {!isLoading ? (
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: Dimensions.get("window").height,
-                    width: Dimensions.get("window").width,
-                    backgroundColor: "#00",
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                  }}
-                >
-                  <ActivityIndicator size="large" color="#fff" />
-                </View>
-              ) : (
+          <View style={styles.userCloseContainer}>
+            <View style={styles.userContainer}>
+              <View style={styles.avatarContainer}>
                 <Image
                   source={{
-                    uri: userInfo[currentUser].stories[currentStory]
-                      .story_image,
-                    cache: "only-if-cached",
+                    uri: userAvatar,
                   }}
-                  style={{ height: "100%", width: "100%" }}
-                  resizeMode="cover"
+                  style={styles.avatarImage}
                 />
-              )}
-            </>
-          ) : (
-            <>
-              {!load && (
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: Dimensions.get("window").height,
-                    width: Dimensions.get("window").width,
-                    backgroundColor: "#00",
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                  }}
-                >
-                  <ActivityIndicator size="large" color="#fff" />
-                </View>
-              )}
-
-              <Video
-                ref={videoRef}
-                source={{
-                  uri: userInfo[currentUser].stories[currentStory].story_video,
-                }}
-                rate={1.0}
-                volume={1.0}
-                resizeMode={ResizeMode.CONTAIN}
-                positionMillis={0}
-                shouldPlay={true}
-                onPlaybackStatusUpdate={(AVPlaybackStatus) => {
-                  // console.log(AVPlaybackStatus.isLoaded);
-                  setLoad(AVPlaybackStatus.isLoaded);
-                }}
-                onReadyForDisplay={() => {}}
-                style={{ height: "100%", width: "100%" }}
-              />
-            </>
-          )}
-
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              height: "86%",
-              width: "100%",
-              zIndex: 999,
-              position: "absolute",
-              bottom: 0,
-            }}
-          >
-            <TouchableWithoutFeedback
-              onPress={() => previousStory()}
-              onLongPress={() => pauseStory()}
-              onPressOut={() => resumeStory()}
+              </View>
+              <Text style={styles.userName}>{userName}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => closeStory()}
             >
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <PanGestureHandler
-                  onGestureEvent={onGestureEvent}
-                  onHandlerStateChange={onGestureStateChange}
-                >
-                  <View style={{ flex: 1 }} />
-                </PanGestureHandler>
-              </GestureHandlerRootView>
-            </TouchableWithoutFeedback>
-            {/* direta */}
-            <TouchableWithoutFeedback
-              onPress={() => nextStory()}
-              onLongPress={() => pauseStory()}
-              onPressOut={() => resumeStory()}
-            >
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <PanGestureHandler
-                  onGestureEvent={onGestureEvent}
-                  onHandlerStateChange={onGestureStateChange}
-                >
-                  <View style={{ flex: 1 }} />
-                </PanGestureHandler>
-              </GestureHandlerRootView>
-            </TouchableWithoutFeedback>
+              <Icon name="x" type="feather" size={30} color={"#fff"} />
+            </TouchableOpacity>
           </View>
         </View>
-      </>
-    );
-  }
-);
+        {currentStoryImage && (
+          <View style={styles.imageContainer}>
+            <Image
+              source={{
+                uri: `${FileSystem.cacheDirectory}${currentStoryImage
+                  .split("/")
+                  .pop()}`,
+              }}
+              style={styles.image}
+              resizeMode="contain"
+            />
+          </View>
+        )}
+        <View style={styles.controlsContainer}>
+          <View style={styles.controls}>
+            {/* // esquerda */}
+            <View style={styles.control}>
+              <TouchableWithoutFeedback
+                onPress={() => previousStory()}
+                onLongPress={() => pauseStory()}
+                onPressOut={() => resumeStory()}
+              >
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <PanGestureHandler
+                    onGestureEvent={onGestureEvent}
+                    onHandlerStateChange={onGestureStateChange}
+                  >
+                    <View style={{ flex: 1 }} />
+                  </PanGestureHandler>
+                </GestureHandlerRootView>
+              </TouchableWithoutFeedback>
+            </View>
+            {/* // direita */}
+            <View style={styles.control}>
+              <TouchableWithoutFeedback
+                onPress={() => nextStory()}
+                onLongPress={() => pauseStory()}
+                onPressOut={() => resumeStory()}
+              >
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <PanGestureHandler
+                    onGestureEvent={onGestureEvent}
+                    onHandlerStateChange={onGestureStateChange}
+                  >
+                    <View style={{ flex: 1 }} />
+                  </PanGestureHandler>
+                </GestureHandlerRootView>
+              </TouchableWithoutFeedback>
+            </View>
+          </View>
+          <View style={styles.seeMore}>
+            <LinearGradient
+              colors={["transparent", "rgba(0,0,0,1)"]}
+              style={styles.seeMoreGradient}
+            />
+            <Icon name="up" type="antdesign" size={25} color={"#fff"} />
+            <Text style={styles.seeMoreText}>Ver Mais</Text>
+          </View>
+        </View>
+      </View>
+    </>
+  );
+}
 
 export default OpenedStory;
+
+const styles = StyleSheet.create({
+  container: {
+    zIndex: 10,
+    height: Dimensions.get("screen").height,
+    width: "100%",
+    backgroundColor: "#000000",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "column",
+  },
+  userProgressContainer: {
+    height: "auto",
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: 15,
+    zIndex: 10,
+  },
+  linearGradient: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    height: 150,
+  },
+  separator: {
+    width: "100%",
+    height: 20,
+  },
+  progressBarContainer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "flex-end",
+    paddingTop: Platform.OS === "ios" ? 10 : 0,
+    paddingHorizontal: 10,
+    height: 30,
+    width: "100%",
+  },
+  userCloseContainer: {
+    width: Dimensions.get("window").width,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 15,
+  },
+  userContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    // marginTop: 5,
+    gap: 10,
+  },
+  avatarContainer: {
+    height: 50,
+    width: 50,
+    padding: 1,
+    borderWidth: 2.5,
+    borderColor: "#29abe2",
+    borderRadius: 100,
+  },
+  avatarImage: {
+    height: "100%",
+    width: "100%",
+    borderRadius: 100,
+  },
+  userName: {
+    fontWeight: "500",
+    fontSize: 16,
+    color: "#fff",
+  },
+  closeButton: {
+    width: 30,
+    height: 30,
+  },
+  imageContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    height: "100%",
+    width: "100%",
+    zIndex: 5,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  image: {
+    height: Dimensions.get("window").height,
+    width: Dimensions.get("window").width,
+  },
+  controlsContainer: {
+    flex: 1,
+    flexDirection: "column",
+    width: "100%",
+    zIndex: 999,
+  },
+  controls: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  control: {
+    flex: 1,
+    width: "100%",
+  },
+  seeMore: {
+    height: 110,
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+  },
+  seeMoreText: {
+    color: "#fff",
+    fontWeight: "500",
+    fontSize: 16,
+  },
+  seeMoreGradient: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 150,
+  },
+});

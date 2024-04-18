@@ -1,0 +1,88 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Bruce Wayne",
+      "avatar": "https://recreio.uol.com.br/media/_versions/dc_comics/batman_quadrinhos_capa_widelg.jpg",
+      "images": [
+        {
+          "id": 1,
+          "image": "https://upload.wikimedia.org/wikipedia/pt/8/8d/Batman_por_Jim_Lee.jpg"
+        },
+        {
+          "id": 2,
+
+          "image": "https://t.ctcdn.com.br/dW8h7oVY5OcOlbeQ8JBoShg2FPQ=/1024x576/smart/i835095.jpeg"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Richard Grayson",
+      "avatar": "https://t.ctcdn.com.br/2kcw4WGukCmuKquhTOlp67pfjyI=/1024x576/smart/i831531.jpeg",
+      "images": [
+        {
+          "id": 1,
+          "image": "https://t.ctcdn.com.br/zCmyzMqdI7sLBTQoAbUcHQmJ7Sw=/1024x576/smart/i814539.jpeg"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Jason Todd",
+      "avatar": "https://pm1.aminoapps.com/6501/3ae6cae9aba96f58c070c3af430a463dcbded3ed_128.jpg ",
+      "images": [
+        {
+          "id": 1,
+          "image": "https://www.einerd.com.br/wp-content/uploads/2020/10/Capuz-Vermelho-Jason-Todd-capa-890x466.jpg"
+        },
+        {
+          "id": 2,
+          "image": "https://s.aficionados.com.br/imagens/habilidades-5.jpg"
+        },
+        {
+          "id": 3,
+          "image": "https://pm1.aminoapps.com/6952/42bbf0a0072299a76f1c881e1ab46119e6d3436er1-705-1080v2_00.jpg"
+        },
+        {
+          "id": 4,
+          "image": "https://pm1.aminoapps.com/6623/de5a3fb2994cf509207c68e4f317250059c272d2_hq.jpg"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Tim Drake",
+      "avatar": "https://assets.mycast.io/characters/tim-drake-1011688-normal.jpg",
+      "images": [
+        {
+          "id": 1,
+          "image": "https://studiojakemedia.files.wordpress.com/2020/03/tim-drake-red-robin.jpg"
+        },
+        {
+          "id": 2,
+          "image": "https://vignette.wikia.nocookie.net/marvel_dc/images/c/cd/Red_Robin_0006.jpg"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Damian Wayne",
+      "avatar": "https://pm1.aminoapps.com/6623/51f9f43fd3c2a587ba06d28075e5d593cd909b5c_hq.jpg",
+      "images": [
+        {
+          "id": 1,
+          "image": "https://pm1.aminoapps.com/6830/861d78d721355f1cf0289428d16c1319c04842adv2_hq.jpg"
+        },
+        {
+          "id": 2,
+          "image": "https://pm1.aminoapps.com/6722/81c61af6303a274f6c70893b7eab8a5cb4cceb11_00.jpg"
+        },
+        {
+          "id": 3,
+          "image": "https://zonafantasmanet.files.wordpress.com/2023/05/robin.jpg"
+        }
+      ]
+    }
+  ]
+}

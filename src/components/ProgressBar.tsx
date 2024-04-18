@@ -27,7 +27,7 @@ const ProgressBar = React.memo(
       let interval: NodeJS.Timeout;
 
       if (!isPaused && isActive) {
-        const intervalDuration = 1; // Intervalo de atualização (10ms)
+        const intervalDuration = 10; // Intervalo de atualização (10ms)
 
         interval = setInterval(() => {
           const currentTime = Date.now();
@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     flex: 1,
     marginHorizontal: 2,
-    marginTop: 50,
   },
   progress: {
     height: 3,
