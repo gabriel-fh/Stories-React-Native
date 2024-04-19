@@ -1,0 +1,96 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Bruce Wayne",
+      "avatar": "https://recreio.uol.com.br/media/_versions/dc_comics/batman_quadrinhos_capa_widelg.jpg",
+      "images": [
+        {
+          "id": 1,
+          "image": "https://i.pinimg.com/originals/39/41/38/39413885c57d17fe713bb5bee35ba722.jpg"
+        },
+        {
+          "id": 2,
+          "image": "https://i.pinimg.com/736x/2c/b2/2f/2cb22f2fdb368f464445d2c37bb2d704.jpg"
+        },
+        {
+          "id": 3,
+          "image": "https://t.ctcdn.com.br/dW8h7oVY5OcOlbeQ8JBoShg2FPQ=/1024x576/smart/i835095.jpeg"
+        },
+        {
+          "id": 4,
+          "image": "https://i.pinimg.com/736x/50/1b/f3/501bf3b4c8e8231d9ba5d68402c64390.jpg"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Richard Grayson",
+      "avatar": "https://t.ctcdn.com.br/2kcw4WGukCmuKquhTOlp67pfjyI=/1024x576/smart/i831531.jpeg",
+      "images": [
+        {
+          "id": 1,
+          "image": "https://i.pinimg.com/736x/fe/31/68/fe31680bad7f6c40abaf4e67d05e0cb4.jpg"
+        },
+        {
+          "id": 2,
+          "image": "https://t.ctcdn.com.br/zCmyzMqdI7sLBTQoAbUcHQmJ7Sw=/1024x576/smart/i814539.jpeg"
+        },
+        {
+          "id": 3,
+          "image": "https://images.hdqwalls.com/download/nightwing-dick-grayson-fanart-4k-y1-1920x1080.jpg"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Jason Todd",
+      "avatar": "https://pm1.aminoapps.com/6501/3ae6cae9aba96f58c070c3af430a463dcbded3ed_128.jpg ",
+      "images": [
+        {
+          "id": 1,
+          "image": "https://i.pinimg.com/736x/87/ae/a1/87aea11ac24b0e7fc909186da2ce8b96.jpg"
+        },
+        {
+          "id": 2,
+          "image": "https://static.wikia.nocookie.net/marvel_dc/images/1/13/Red_Hood_Outlaw_Vol_1_51_Textless_Variant.jpg"
+        },
+        {
+          "id": 3,
+          "image": "https://www.einerd.com.br/wp-content/uploads/2020/10/Capuz-Vermelho-Jason-Todd-capa-890x466.jpg"
+        },
+
+        {
+          "id": 4,
+          "image": "https://i.pinimg.com/originals/03/69/89/0369899531622f6d5999e7711e8b5895.jpg"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Tim Drake",
+      "avatar": "https://assets.mycast.io/characters/tim-drake-1011688-normal.jpg",
+      "images": [
+        {
+          "id": 1,
+          "image": "https://vignette.wikia.nocookie.net/marvel_dc/images/c/cd/Red_Robin_0006.jpg"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Damian Wayne",
+      "avatar": "https://pm1.aminoapps.com/6623/51f9f43fd3c2a587ba06d28075e5d593cd909b5c_hq.jpg",
+      "images": [
+        {
+          "id": 1,
+          "image": "https://i.pinimg.com/736x/3f/98/39/3f9839358d0ee425f108a272804203ec.jpg"
+        },
+        {
+          "id": 2,
+          "image": "https://i.pinimg.com/736x/4f/51/3b/4f513b819ca5f6bf7ed9b3aeb10659db.jpg"
+        }
+      ]
+    }
+  ]
+}
