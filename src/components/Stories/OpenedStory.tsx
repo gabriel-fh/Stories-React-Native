@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -19,6 +19,8 @@ import {
   PanGestureHandler,
   State,
 } from "react-native-gesture-handler";
+import BottomSheet, { BottomSheetMethods } from "../BottomSheet/BottomSheet";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 function OpenedStory({
   userInfo,
@@ -42,6 +44,11 @@ function OpenedStory({
   const [progress, setProgress] = useState<number>(0);
   const [gestureStateX, setGestureStateX] = useState<number>(0);
   const [gestureStateY, setGestureStateY] = useState<number>(0);
+  const bottomSheetRef = useRef<BottomSheetMethods>(null);
+
+  const openBottomSheet = useCallback(() => {
+    bottomSheetRef.current?.expand();
+  }, []);
 
   const pauseStory = useCallback(() => {
     setIsPaused(true);
@@ -102,6 +109,8 @@ function OpenedStory({
 
       if (gestureStateY > 45 && Math.abs(gestureStateX) < 60) {
         closeStory();
+      } else if (gestureStateY < -200) {
+        openBottomSheet();
       } else if (gestureStateX < -60) {
         nextUser();
       } else if (gestureStateX > 60) {
@@ -111,10 +120,10 @@ function OpenedStory({
   };
 
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
-      <View style={styles.container}>
-        <View style={styles.userProgressContainer}>
+      <GestureHandlerRootView style={styles.container}>
+        <View style={[styles.userProgressContainer]}>
           <LinearGradient
             colors={["rgba(0,0,0,1)", "transparent"]}
             style={styles.linearGradient}
@@ -125,7 +134,6 @@ function OpenedStory({
               return (
                 <ProgressBar
                   key={index}
-                  index={index}
                   duration={4}
                   finished={index < currentStory}
                   nextStory={nextStory}
@@ -216,8 +224,16 @@ function OpenedStory({
             <Text style={styles.seeMoreText}>Ver Mais</Text>
           </View>
         </View>
-      </View>
-    </>
+        <BottomSheet
+          ref={bottomSheetRef}
+          snapTo={"90%"}
+          backgroundColor={"white"}
+          backDropColor={"black"}
+          onOpen={() => setIsPaused(true)}
+          onClose={() => setIsPaused(false)}
+        ></BottomSheet>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }
 
@@ -233,6 +249,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "column",
+    position: "relative",
   },
   userProgressContainer: {
     height: "auto",
@@ -275,15 +292,14 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    // marginTop: 5,
     gap: 10,
   },
   avatarContainer: {
-    height: 50,
-    width: 50,
+    height: 45,
+    width: 45,
     padding: 1,
     borderWidth: 2.5,
-    borderColor: "#29abe2",
+    borderColor: "darkcyan",
     borderRadius: 100,
   },
   avatarImage: {
@@ -293,7 +309,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontWeight: "500",
-    fontSize: 16,
+    fontSize: 15,
     color: "#fff",
   },
   closeButton: {
@@ -304,9 +320,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     left: 0,
-    height: "100%",
+    height: Dimensions.get("window").height,
     width: "100%",
-    zIndex: 5,
+    zIndex: -10,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -316,10 +332,13 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
   },
   controlsContainer: {
-    flex: 1,
+    height: Dimensions.get("window").height,
     flexDirection: "column",
     width: "100%",
-    zIndex: 999,
+    zIndex: 9,
+    position: "absolute",
+    left: 0,
+    bottom: 0,
   },
   controls: {
     flex: 1,
@@ -330,10 +349,13 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   seeMore: {
-    height: 110,
+    height: 150,
     width: "100%",
     display: "flex",
     alignItems: "center",
+    zIndex: -2,
+    position: "absolute",
+    bottom: 0,
   },
   seeMoreText: {
     color: "#fff",
@@ -345,6 +367,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 150,
+    height: 200,
   },
 });

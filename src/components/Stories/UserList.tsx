@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     width: 70,
     padding: 1,
     borderWidth: 3,
-    borderColor: "#29abe2",
+    borderColor: "darkcyan",
     borderRadius: 100,
   },
   avatarImage: {
@@ -107,5 +107,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontWeight: "500",
     fontSize: 14,
+    color: "#fff",
   },
 });

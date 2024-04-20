@@ -33,9 +33,3 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
-
-test.tsx
-
-.vscode
-
-.story-video

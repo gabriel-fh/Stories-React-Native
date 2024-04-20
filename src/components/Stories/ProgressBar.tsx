@@ -3,7 +3,6 @@ import { View, StyleSheet } from "react-native";
 
 const ProgressBar = React.memo(
   ({
-    index,
     duration,
     nextStory,
     isPaused,
@@ -12,7 +11,6 @@ const ProgressBar = React.memo(
     setProgress,
     finished,
   }: {
-    index: number;
     duration: number;
     nextStory: Function;
     isPaused: boolean;
@@ -41,11 +39,6 @@ const ProgressBar = React.memo(
             nextStory();
             setProgress(0);
           }
-
-          // if(resetProgress) {
-          //     clearInterval(interval);
-          //     setProgress(0)
-          // }
         }, intervalDuration);
       }
 
