@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -10,7 +10,6 @@ import {
   View,
   StyleSheet,
   Platform,
-  Button,
 } from "react-native";
 import ProgressBar from "./ProgressBar";
 import { Icon } from "react-native-elements";
@@ -110,7 +109,7 @@ function OpenedStory({
 
       if (gestureStateY > 45 && Math.abs(gestureStateX) < 60) {
         closeStory();
-      } else if (gestureStateY < -200 ) {
+      } else if (gestureStateY < -200) {
         openBottomSheet();
       } else if (gestureStateX < -60) {
         nextUser();
@@ -293,7 +292,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    // marginTop: 5,
     gap: 10,
   },
   avatarContainer: {
@@ -356,7 +354,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     zIndex: -2,
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
   },
   seeMoreText: {

@@ -39,11 +39,6 @@ const ProgressBar = React.memo(
             nextStory();
             setProgress(0);
           }
-
-          // if(resetProgress) {
-          //     clearInterval(interval);
-          //     setProgress(0)
-          // }
         }, intervalDuration);
       }
 
