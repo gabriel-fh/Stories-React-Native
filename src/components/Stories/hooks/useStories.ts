@@ -31,6 +31,22 @@ export const useStories = (
     const fetchStorageData = async () => {
       try {
         const data = await getData();
+        const user = data.find(
+          (item) => item.id === userInfo[currentUser].id.toString()
+        );
+        if (user) {
+          const lastStory = user.stories[user.stories.length - 1];
+          const storyIndex = user.stories.findIndex(
+            (item) => item.id === lastStory.id
+          );
+          // if(user.stories.length === userStories.length) {
+          //   setCurrentStory(0);
+          //   return;
+          // }
+          if (storyIndex !== -1 && user.stories.length !== userStories.length) {
+            setCurrentStory(storyIndex + 1);
+          }
+        }
         setStorageData(data);
       } catch (err) {
         console.error("Erro ao buscar dados do AsyncStorage", err);
@@ -84,8 +100,7 @@ export const useStories = (
               });
             }
           }
-          setData(data);
-          data.forEach((item) => console.log("item", item));
+          await setData(data);
         }
       } catch (err) {
         console.error("Erro ao salvar dados no AsyncStorage", err);
