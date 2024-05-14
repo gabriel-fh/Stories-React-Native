@@ -1,28 +1,23 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-type StorageData = {
-  id: string;
-  stories: {
-    id: string;
-  }[];
-};
 
 export const useStorage = () => {
-  const getData = async (): Promise<void> => {
+const getData = async (): Promise<StorageData[]> => {
     let data;
     try {
-      data = await AsyncStorage.getItem("@StoriesApp:userData");
-      data = data ? JSON.parse(data) : [];
+        data = await AsyncStorage.getItem("@StoriesApp:userData");
+        data = data ? await JSON.parse(data) : [];
+        return data;
     } catch (err) {
-      console.error("Erro ao buscar dados do AsyncStorage", err);
+        throw err;
     }
-  };
+};
 
-  const setData = async (data: StorageData): Promise<void> => {
+  const setData = async (data: StorageData[]): Promise<void> => {
     try {
       await AsyncStorage.setItem("@StoriesApp:userData", JSON.stringify(data));
     } catch (err) {
-      console.error("Erro ao salvar dados no AsyncStorage", err);
+      throw err;
     }
   };
 

@@ -1,6 +1,8 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { State } from "react-native-gesture-handler";
 import { BottomSheetMethods } from "../../BottomSheet/BottomSheet";
+import { useStorage } from "./useStorage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const useStories = (
   userInfo: User[],
@@ -22,6 +24,53 @@ export const useStories = (
   const [gestureStateX, setGestureStateX] = useState<number>(0);
   const [gestureStateY, setGestureStateY] = useState<number>(0);
   const bottomSheetRef = useRef<BottomSheetMethods>(null);
+  const { getData, setData } = useStorage();
+  const [storageData, setStorageData] = useState<StorageData[]>([]);
+
+  useEffect(() => {
+    const fetchStorageData = async () => {
+      try {
+        const data = await getData();
+        setStorageData(data);
+      } catch (err) {
+        console.error("Erro ao buscar dados do AsyncStorage", err);
+      }
+    };
+
+    fetchStorageData();
+  }, [currentStory]);
+
+  // useEffect(() => {
+  //   AsyncStorage.clear();
+  // }, []);
+
+  useEffect(() => {
+    const markStoryAsSeen = async () => {
+      try {
+        const data = await getData();
+        if (data.length === 0) {
+          console.log("storageData vazio", data);
+          await setData([
+            ...data,
+            {
+              id: user.id.toString(),
+              stories: [
+                {
+                  id: userStories[currentStory].id.toString(),
+                },
+              ],
+            },
+          ]);
+        } else {
+          console.log("storageData salvo", data);
+        }
+      } catch (err) {
+        console.error("Erro ao salvar dados no AsyncStorage", err);
+      }
+    };
+  
+    markStoryAsSeen();
+  }, [storageData]);
 
   const setProgressCallback = useCallback((value: number) => {
     setProgress(value);

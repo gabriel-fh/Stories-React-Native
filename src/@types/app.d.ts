@@ -9,3 +9,10 @@ type User = {
   avatar: ImageSourcePropType;
   images: Story[];
 };
+
+type StorageData = {
+  id: string;
+  stories: {
+    id: string;
+  }[];
+};
