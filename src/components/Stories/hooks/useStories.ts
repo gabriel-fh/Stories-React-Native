@@ -53,7 +53,7 @@ export const useStories = (
           await setData([
             ...data,
             {
-              id: user.id.toString(),
+              id: userInfo[currentUser].id.toString(),
               stories: [
                 {
                   id: userStories[currentStory].id.toString(),
@@ -62,13 +62,36 @@ export const useStories = (
             },
           ]);
         } else {
-          console.log("storageData salvo", data);
+          const user = data.find(
+            (item) => item.id === userInfo[currentUser].id.toString()
+          );
+          if (!user) {
+            data.push({
+              id: userInfo[currentUser].id.toString(),
+              stories: [
+                {
+                  id: userStories[currentStory].id.toString(),
+                },
+              ],
+            });
+          } else {
+            const story = user.stories.find(
+              (item) => item.id === userStories[currentStory].id.toString()
+            );
+            if (!story) {
+              user.stories.push({
+                id: userStories[currentStory].id.toString(),
+              });
+            }
+          }
+          setData(data);
+          data.forEach((item) => console.log("item", item));
         }
       } catch (err) {
         console.error("Erro ao salvar dados no AsyncStorage", err);
       }
     };
-  
+
     markStoryAsSeen();
   }, [storageData]);
 
