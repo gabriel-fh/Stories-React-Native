@@ -21,6 +21,8 @@ import {
 } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetMethods } from "../BottomSheet/BottomSheet";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { useStories } from "./hooks/useStories";
+import NavigationControls from "./NavigationControls";
 
 function OpenedStory({
   userInfo,
@@ -28,96 +30,28 @@ function OpenedStory({
   user,
 }: {
   userInfo: User[];
-  closeStory: Function;
+  closeStory: () => void;
   user: User;
 }) {
-  const [currentStory, setCurrentStory] = useState<number>(0);
-  const [currentUser, setCurrentUser] = useState<number>(
-    userInfo.findIndex((currentUser) => currentUser.id === user.id)
-  );
-
-  const userAvatar = userInfo[currentUser]?.avatar;
-  const userName = userInfo[currentUser]?.name;
-  const currentStoryImage = userInfo[currentUser].images[currentStory]?.image;
-
-  const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [progress, setProgress] = useState<number>(0);
-  const [gestureStateX, setGestureStateX] = useState<number>(0);
-  const [gestureStateY, setGestureStateY] = useState<number>(0);
-  const bottomSheetRef = useRef<BottomSheetMethods>(null);
-
-  const openBottomSheet = useCallback(() => {
-    bottomSheetRef.current?.expand();
-  }, []);
-
-  const pauseStory = useCallback(() => {
-    setIsPaused(true);
-  }, [currentStory]);
-
-  const resumeStory = function () {
-    setIsPaused(false);
-  };
-
-  const nextUser = () => {
-    if (currentUser !== userInfo.length - 1) {
-      setCurrentUser((prevState) => prevState + 1);
-      setCurrentStory(0);
-    } else {
-      closeStory();
-    }
-    setProgress(0);
-  };
-
-  const previousUser = () => {
-    if (currentUser - 1 >= 0) {
-      setCurrentUser((prevState) => prevState - 1);
-      setCurrentStory(userInfo[currentUser - 1].images.length - 1);
-    }
-    setProgress(0);
-  };
-
-  const nextStory = () => {
-    if (currentStory !== userInfo[currentUser].images.length - 1) {
-      setCurrentStory((prevState) => prevState + 1);
-    } else {
-      nextUser();
-    }
-    setProgress(0);
-  };
-
-  const previousStory = () => {
-    if (currentStory - 1 >= 0) {
-      setCurrentStory((prevState) => prevState - 1);
-    } else {
-      previousUser();
-    }
-    setProgress(0);
-  };
-
-  const onGestureEvent = (event: any) => {
-    setGestureStateX(event.nativeEvent.translationX);
-    setGestureStateY(event.nativeEvent.translationY);
-  };
-
-  const onGestureStateChange = (event: any) => {
-    const { state } = event.nativeEvent;
-
-    if (state === State.BEGAN || state === State.ACTIVE) {
-      pauseStory();
-    } else if (state === State.END) {
-      resumeStory();
-
-      if (gestureStateY > 45 && Math.abs(gestureStateX) < 60) {
-        closeStory();
-      } else if (gestureStateY < -200) {
-        openBottomSheet();
-      } else if (gestureStateX < -60) {
-        nextUser();
-      } else if (gestureStateX > 60) {
-        previousUser();
-      }
-    }
-  };
+  const  {
+    userAvatar,
+    userName,
+    currentStoryImage,
+    isPaused,
+    progress,
+    bottomSheetRef,
+    currentStory,
+    userStories,
+    nextStory,
+    previousStory,
+    setIsPaused,
+    pauseStory,
+    resumeStory,
+    setProgress,
+    onGestureEvent,
+    onGestureStateChange,
+    openBottomSheet,
+  } = useStories(userInfo, user, closeStory);
 
   return (
     <SafeAreaProvider>
@@ -130,7 +64,7 @@ function OpenedStory({
           />
           <View style={styles.separator} />
           <View style={styles.progressBarContainer}>
-            {userInfo[currentUser].images.map((_, index) => {
+            {userStories.map((_, index) => {
               return (
                 <ProgressBar
                   key={index}
@@ -178,52 +112,15 @@ function OpenedStory({
             />
           </View>
         )}
-        <View style={styles.controlsContainer}>
-          <View style={styles.controls}>
-            {/* // esquerda */}
-            <View style={styles.control}>
-              <TouchableWithoutFeedback
-                onPress={() => previousStory()}
-                onLongPress={() => pauseStory()}
-                onPressOut={() => resumeStory()}
-              >
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                  <PanGestureHandler
-                    onGestureEvent={onGestureEvent}
-                    onHandlerStateChange={onGestureStateChange}
-                  >
-                    <View style={{ flex: 1 }} />
-                  </PanGestureHandler>
-                </GestureHandlerRootView>
-              </TouchableWithoutFeedback>
-            </View>
-            {/* // direita */}
-            <View style={styles.control}>
-              <TouchableWithoutFeedback
-                onPress={() => nextStory()}
-                onLongPress={() => pauseStory()}
-                onPressOut={() => resumeStory()}
-              >
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                  <PanGestureHandler
-                    onGestureEvent={onGestureEvent}
-                    onHandlerStateChange={onGestureStateChange}
-                  >
-                    <View style={{ flex: 1 }} />
-                  </PanGestureHandler>
-                </GestureHandlerRootView>
-              </TouchableWithoutFeedback>
-            </View>
-          </View>
-          <View style={styles.seeMore}>
-            <LinearGradient
-              colors={["transparent", "rgba(0,0,0,1)"]}
-              style={styles.seeMoreGradient}
-            />
-            <Icon name="up" type="antdesign" size={25} color={"#fff"} />
-            <Text style={styles.seeMoreText}>Ver Mais</Text>
-          </View>
-        </View>
+        <NavigationControls
+          previousStory={previousStory}
+          nextStory={nextStory}
+          pauseStory={pauseStory}
+          resumeStory={resumeStory}
+          onGestureEvent={onGestureEvent}
+          onGestureStateChange={onGestureStateChange}
+          openBottomSheet={openBottomSheet}
+        />
         <BottomSheet
           ref={bottomSheetRef}
           snapTo={"90%"}
