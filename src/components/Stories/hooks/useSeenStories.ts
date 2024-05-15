@@ -88,5 +88,25 @@ export const useSeenStories = () => {
     [getData]
   );
 
-  return { markStoryAsSeen, verifyStories };
+  const sortSeenStories = useCallback(async (userList: User[]) => {
+    try {
+      const data = await getData();
+      const newArray = userList.reduce((acc, item, idx) => {
+        const user = data.find((userStorage) => Number(userStorage.id) === Number(item.id));
+          if(!!user) {
+            if(item.images.length === user.stories.length) {
+              const remove = acc.splice(idx, 1);
+              acc.push(remove[0]);
+            }
+          }
+          return acc;
+      },userList);
+      return newArray;
+    } catch (error) {
+      console.error("Erro ao ordenar histórias", error);
+    }
+    return userList;
+  }, []);
+
+  return { markStoryAsSeen, verifyStories, sortSeenStories };
 };

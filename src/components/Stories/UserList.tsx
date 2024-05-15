@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Image,
@@ -9,22 +9,28 @@ import {
   StyleSheet,
 } from "react-native";
 import OpenedStory from "./OpenedStory";
+import { useSeenStories } from "./hooks/useSeenStories";
 
 const UserList = React.memo(({ userInfo }: { userInfo: User[] }) => {
   const [openedStory, setOpenedStory] = useState<User | null>(null);
+  const [userList, setUserList] = useState<User[]>(userInfo);
+  const { sortSeenStories } = useSeenStories();
 
   const handlePressUser = (user: User) => {
     setOpenedStory(user);
   };
 
-  const handleCloseStory = () => {
+  const handleCloseStory = async () => {
     setOpenedStory(null);
+    sortSeenStories(userList).then((sortedList) => {
+      setUserList(sortedList)
+    });
   };
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={userInfo}
+        data={userList}
         keyExtractor={(item) => item.id.toString()}
         horizontal={true}
         style={styles.flatList}
