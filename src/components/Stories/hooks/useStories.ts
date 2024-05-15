@@ -3,6 +3,7 @@ import { State } from "react-native-gesture-handler";
 import { BottomSheetMethods } from "../../BottomSheet/BottomSheet";
 import { useStorage } from "./useStorage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSeenStories } from "./useSeenStories";
 
 export const useStories = (
   userInfo: User[],
@@ -24,8 +25,10 @@ export const useStories = (
   const [gestureStateX, setGestureStateX] = useState<number>(0);
   const [gestureStateY, setGestureStateY] = useState<number>(0);
   const bottomSheetRef = useRef<BottomSheetMethods>(null);
-  const { getData, setData } = useStorage();
+  const { getData } = useStorage();
   const [storageData, setStorageData] = useState<StorageData[]>([]);
+
+  const { markStoryAsSeen, verifyStories } = useSeenStories();
 
   useEffect(() => {
     const fetchStorageData = async () => {
@@ -35,79 +38,37 @@ export const useStories = (
           (item) => item.id === userInfo[currentUser].id.toString()
         );
         if (user) {
-          const lastStory = user.stories[user.stories.length - 1];
-          const storyIndex = user.stories.findIndex(
-            (item) => item.id === lastStory.id
-          );
-          // if(user.stories.length === userStories.length) {
-          //   setCurrentStory(0);
-          //   return;
-          // }
-          if (storyIndex !== -1 && user.stories.length !== userStories.length) {
-            setCurrentStory(storyIndex + 1);
+          if (user.stories.length !== userStories.length) {
+            verifyStories({
+              userInfo,
+              currentUser: currentUser,
+              userStories: userInfo[currentUser].images,
+            }).then((res) => {
+              setCurrentStory(res);
+            });
           }
         }
+      } catch (err) {
+        console.error("Erro ao buscar dados do AsyncStorage", err);
+      }
+    };
+    fetchStorageData();
+  }, [currentUser]);
+
+  useEffect(() => {
+    const fetchStorageData = async () => {
+      try {
+        const data = await getData();
         setStorageData(data);
       } catch (err) {
         console.error("Erro ao buscar dados do AsyncStorage", err);
       }
     };
-
     fetchStorageData();
   }, [currentStory]);
 
-  // useEffect(() => {
-  //   AsyncStorage.clear();
-  // }, []);
-
   useEffect(() => {
-    const markStoryAsSeen = async () => {
-      try {
-        const data = await getData();
-        if (data.length === 0) {
-          console.log("storageData vazio", data);
-          await setData([
-            ...data,
-            {
-              id: userInfo[currentUser].id.toString(),
-              stories: [
-                {
-                  id: userStories[currentStory].id.toString(),
-                },
-              ],
-            },
-          ]);
-        } else {
-          const user = data.find(
-            (item) => item.id === userInfo[currentUser].id.toString()
-          );
-          if (!user) {
-            data.push({
-              id: userInfo[currentUser].id.toString(),
-              stories: [
-                {
-                  id: userStories[currentStory].id.toString(),
-                },
-              ],
-            });
-          } else {
-            const story = user.stories.find(
-              (item) => item.id === userStories[currentStory].id.toString()
-            );
-            if (!story) {
-              user.stories.push({
-                id: userStories[currentStory].id.toString(),
-              });
-            }
-          }
-          await setData(data);
-        }
-      } catch (err) {
-        console.error("Erro ao salvar dados no AsyncStorage", err);
-      }
-    };
-
-    markStoryAsSeen();
+    markStoryAsSeen({ userInfo, currentUser, userStories, currentStory });
   }, [storageData]);
 
   const setProgressCallback = useCallback((value: number) => {
@@ -128,8 +89,14 @@ export const useStories = (
 
   const nextUser = () => {
     if (currentUser !== userInfo.length - 1) {
-      setCurrentUser((prevState) => prevState + 1);
-      setCurrentStory(0);
+      verifyStories({
+        userInfo,
+        currentUser: currentUser + 1,
+        userStories: userInfo[currentUser + 1].images,
+      }).then((res) => {
+        setCurrentUser((prevState) => prevState + 1);
+        setCurrentStory(res);
+      });
     } else {
       closeStory();
     }

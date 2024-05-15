@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import * as FileSystem from "expo-file-system";
 import userData from "../../data/data.json";
 import UserList from "./UserList";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Stories() {
   const data: User[] = userData.users;
@@ -26,6 +27,10 @@ export default function Stories() {
     }
     fetchImage();
   }, [data]);
-  
+
+  // useEffect(() => {
+  //   AsyncStorage.clear();
+  // }, []);
+
   return data && data.length > 0 && <UserList userInfo={data} />;
 }
