@@ -23,7 +23,7 @@ const UserList = React.memo(({ userInfo }: { userInfo: User[] }) => {
   const handleCloseStory = async () => {
     setOpenedStory(null);
     sortSeenStories(userList).then((sortedList) => {
-      setUserList(sortedList)
+      setUserList([...sortedList])
     });
   };
 
