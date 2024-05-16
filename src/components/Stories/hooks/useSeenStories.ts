@@ -91,15 +91,17 @@ export const useSeenStories = () => {
     try {
       const data = await getData();
       const newArray = userList.reduce((acc, item, idx) => {
-        const user = data.find((userStorage) => Number(userStorage.id) === Number(item.id));
-          if(!!user) {
-            if(item.images.length === user.stories.length) {
-              const remove = acc.splice(idx, 1);
-              acc.push(remove[0]);
-            }
+        const user = data.find(
+          (userStorage) => Number(userStorage.id) === Number(item.id)
+        );
+        if (!!user) {
+          if (item.images.length === user.stories.length) {
+            const remove = acc.splice(idx, 1);
+            acc.push(remove[0]);
           }
-          return acc;
-      },userList);
+        }
+        return acc;
+      }, userList);
       return newArray;
     } catch (error) {
       console.error("Erro ao ordenar histórias", error);
@@ -107,25 +109,31 @@ export const useSeenStories = () => {
     return userList;
   }, []);
 
-  const removeUserStory = async (id: number, type: string) => {
+
+  const syncDataWithAPI = async (userList: User[]) => {
     try {
+      // Obter dados do AsyncStorage
       const data = await getData();
-      if (type === "story") {
-        const newData = data.map((user) => {
-          const newImages = user.stories.filter(
-            (image) => image.id !== id.toString()
-          );
-          return { ...user, images: newImages };
-        });
-        await setData(newData);
-      } else {
-        const newData = data.filter((user) => user.id !== id.toString());
-        await setData(newData);
-      }
+  
+      // Filtrar usuários e histórias que ainda existem na API
+      const syncedData = data.filter((storageUser) =>
+        userList.some((apiUser) => apiUser.id.toString() === storageUser.id)
+      );
+  
+      syncedData.forEach((user) => {
+        user.stories = user.stories.filter((story) =>
+          userList.find((apiUser) => apiUser.id.toString() === user.id)?.images.some(
+            (image) => image.id.toString() === story.id
+          )
+        );
+      });
+  
+      // Atualizar AsyncStorage com os dados sincronizados
+      await setData(syncedData);
     } catch (err) {
-      console.error("Erro ao remover histórias", err);
+      console.error("Erro ao sincronizar dados com a API", err);
     }
   };
 
-  return { markStoryAsSeen, verifyStories, sortSeenStories, removeUserStory };
+  return { markStoryAsSeen, verifyStories, sortSeenStories, syncDataWithAPI };
 };

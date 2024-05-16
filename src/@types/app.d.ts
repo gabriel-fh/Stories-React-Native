@@ -4,7 +4,7 @@ type Story = {
 }
 
 type User = {
-  id: Number;
+  id: number;
   name: String;
   avatar: ImageSourcePropType;
   images: Story[];

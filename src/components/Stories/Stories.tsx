@@ -4,9 +4,18 @@ import * as FileSystem from "expo-file-system";
 import userData from "../../data/data.json";
 import UserList from "./UserList";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSeenStories } from "./hooks/useSeenStories";
 
 export default function Stories() {
   const data: User[] = userData.users;
+
+  const { syncDataWithAPI } = useSeenStories();
+
+  useEffect(() => {
+    if (data) {
+      syncDataWithAPI(data);
+    }
+  }, [data]);
 
   useEffect(() => {
     async function fetchImage() {
