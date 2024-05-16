@@ -1,5 +1,5 @@
 type Story = {
-  id: Number;
+  id: number;
   image: string;
 }
 
