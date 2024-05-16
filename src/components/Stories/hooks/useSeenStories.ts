@@ -22,7 +22,6 @@ export const useSeenStories = () => {
     try {
       const data = await getData();
       if (data.length === 0) {
-        console.log("storageData vazio", data);
         await setData([
           ...data,
           {
@@ -108,5 +107,25 @@ export const useSeenStories = () => {
     return userList;
   }, []);
 
-  return { markStoryAsSeen, verifyStories, sortSeenStories };
+  const removeUserStory = async (id: number, type: string) => {
+    try {
+      const data = await getData();
+      if (type === "story") {
+        const newData = data.map((user) => {
+          const newImages = user.stories.filter(
+            (image) => image.id !== id.toString()
+          );
+          return { ...user, images: newImages };
+        });
+        await setData(newData);
+      } else {
+        const newData = data.filter((user) => user.id !== id.toString());
+        await setData(newData);
+      }
+    } catch (err) {
+      console.error("Erro ao remover histórias", err);
+    }
+  };
+
+  return { markStoryAsSeen, verifyStories, sortSeenStories, removeUserStory };
 };
